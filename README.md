@@ -11,9 +11,10 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/nicktrienenern/Hashy/releases">Download</a> &middot;
-  <a href="https://github.com/nicktrienenern/Hashy/issues">Issues</a> &middot;
-  <a href="#features">Features</a>
+  <a href="https://polka-computer.github.io/hashy.releases/download.html">Download for macOS</a> &middot;
+  <a href="https://apps.apple.com/us/app/hashy-markdown-notes/id6759118041">Download for iOS</a> &middot;
+  <a href="https://github.com/polka-computer/Hashy/issues">Issues</a> &middot;
+  <a href="https://discord.gg/zwpnkxETJ3">Discord</a>
 </p>
 
 ---
@@ -115,7 +116,7 @@ Hashy/                         Xcode app target (macOS/iOS)
 site/                          Landing page (Vite + React)
 ```
 
-**Key dependencies:** SwiftUI, TCA (Composable Architecture), STTextView, Conduit, Yams, ULID.swift
+**Key dependencies:** SwiftUI, TCA (Composable Architecture), [STTextView](https://github.com/krzyzanowskim/STTextView), Conduit, Yams, ULID.swift
 
 ## License
 
