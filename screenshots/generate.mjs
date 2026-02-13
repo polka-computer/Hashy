@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const SIZES = {
-  'iphone-6.9': { w: 1260, h: 2736 },
+  'iphone-6.7': { w: 1284, h: 2778 },  // iPhone 14 Pro Max, 15 Pro Max
   'ipad-13':    { w: 2064, h: 2752 },
 }
 
