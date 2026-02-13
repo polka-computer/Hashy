@@ -1,92 +1,120 @@
 import Foundation
+import os.log
 
-/// Installs a Claude Code skill into the vault directory so users
-/// running `claude` inside their vault know how to work with it.
+/// Installs the Claude Code skill directory and session hook into the vault
+/// so users running `claude` inside their vault get Hashy-aware helpers.
+///
+/// Installed layout:
+/// ```
+/// .claude/
+/// ├── settings.local.json          ← SessionStart hook (sources vault-search.sh)
+/// └── skills/hashy/
+///     ├── SKILL.md
+///     └── scripts/
+///         └── vault-search.sh
+/// ```
+///
+/// Files are **always overwritten** on every app launch so that updates
+/// shipped in new app versions are picked up immediately.
 public enum VaultSkillInstaller {
-    /// Ensures `.claude/skills/hashy/SKILL.md` exists in the given vault directory.
-    /// Only writes if the file is missing or outdated.
+
+    private static let logger = Logger(
+        subsystem: "ca.long.tail.labs.hashy",
+        category: "VaultSkillInstaller"
+    )
+
+    /// Installs (or updates) the Claude Code skill and session hook in the vault.
     public static func installIfNeeded(in vaultDirectory: URL) {
-        let skillDir = vaultDirectory
-            .appendingPathComponent(".claude")
+        let claudeDir = vaultDirectory.appendingPathComponent(".claude")
+        let skillDir = claudeDir
             .appendingPathComponent("skills")
             .appendingPathComponent("hashy")
-        let skillFile = skillDir.appendingPathComponent("SKILL.md")
+        let scriptsDir = skillDir.appendingPathComponent("scripts")
 
-        // Check if current version already installed
-        if let existing = try? String(contentsOf: skillFile, encoding: .utf8),
-           existing.contains(versionMarker) {
+        // --- Load resources from bundle ---
+
+        guard let skillContent = loadBundleResource(name: "SKILL", ext: "md") else {
+            logger.error("Failed to load SKILL.md from bundle resources")
             return
         }
 
-        try? FileManager.default.createDirectory(at: skillDir, withIntermediateDirectories: true)
-        try? skillContent.write(to: skillFile, atomically: true, encoding: .utf8)
+        guard let scriptContent = loadBundleResource(name: "vault-search", ext: "sh", subdirectory: "Skills/scripts")
+                ?? loadBundleResource(name: "vault-search", ext: "sh") else {
+            logger.error("Failed to load vault-search.sh from bundle resources")
+            return
+        }
+
+        // --- Write skill files (always overwrite) ---
+
+        do {
+            try FileManager.default.createDirectory(at: scriptsDir, withIntermediateDirectories: true)
+            try skillContent.write(to: skillDir.appendingPathComponent("SKILL.md"), atomically: true, encoding: .utf8)
+            try scriptContent.write(to: scriptsDir.appendingPathComponent("vault-search.sh"), atomically: true, encoding: .utf8)
+        } catch {
+            logger.error("Failed to install skill files: \(error.localizedDescription)")
+        }
+
+        // --- Ensure SessionStart hook in settings.local.json ---
+
+        installSessionHook(in: claudeDir)
     }
 
-    // Bump this when skill content changes to trigger re-install
-    private static let versionMarker = "hashy-skill-v1"
+    // MARK: - Private
 
-    private static let skillContent = """
----
-name: hashy
-description: How to work with this Hashy notes vault. Loaded when searching, reading, or creating notes.
-user-invocable: false
----
+    private static func loadBundleResource(name: String, ext: String, subdirectory: String = "Skills") -> String? {
+        guard let url = Bundle.module.url(forResource: name, withExtension: ext, subdirectory: subdirectory)
+                ?? Bundle.module.url(forResource: name, withExtension: ext) else {
+            return nil
+        }
+        return try? String(contentsOf: url, encoding: .utf8)
+    }
 
-<!-- hashy-skill-v1 -->
+    /// Ensures `.claude/settings.local.json` contains the SessionStart hook that
+    /// sources `vault-search.sh` into `CLAUDE_ENV_FILE`.
+    private static func installSessionHook(in claudeDir: URL) {
+        let settingsFile = claudeDir.appendingPathComponent("settings.local.json")
+        let hookCommand = "cat \"$CLAUDE_PROJECT_DIR\"/.claude/skills/hashy/scripts/vault-search.sh >> \"$CLAUDE_ENV_FILE\""
 
-# Hashy Vault
+        // Read existing settings (or start fresh)
+        var root: [String: Any]
+        if let data = try? Data(contentsOf: settingsFile),
+           let parsed = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            root = parsed
+        } else {
+            root = [:]
+        }
 
-This directory is a Hashy knowledge base. Files here sync across devices and appear in the Hashy app.
+        // Check if our hook is already present
+        if let hooks = root["hooks"] as? [String: Any],
+           let sessionStart = hooks["SessionStart"] as? [[String: Any]] {
+            let alreadyInstalled = sessionStart.contains { group in
+                guard let innerHooks = group["hooks"] as? [[String: Any]] else { return false }
+                return innerHooks.contains { ($0["command"] as? String) == hookCommand }
+            }
+            if alreadyInstalled { return }
+        }
 
-## Reading & searching notes
+        // Build the hook entry
+        let hookEntry: [String: Any] = [
+            "hooks": [[
+                "type": "command",
+                "command": hookCommand
+            ]]
+        ]
 
-Use your normal tools to explore:
+        // Merge into existing hooks
+        var hooks = root["hooks"] as? [String: Any] ?? [:]
+        var sessionStartArray = hooks["SessionStart"] as? [[String: Any]] ?? []
+        sessionStartArray.append(hookEntry)
+        hooks["SessionStart"] = sessionStartArray
+        root["hooks"] = hooks
 
-- `Grep` to search note content (e.g. find all notes mentioning "kubernetes")
-- `Glob` to find files by pattern (e.g. `*.md`)
-- `Read` to read a note's content
-
-## Creating notes
-
-Create new notes as markdown files in the **root of this directory**. Do NOT create subdirectories.
-
-**Filename**: Use a ULID (time-ordered unique ID) with `.md` extension. Example: `01J5A3B9KP7QXYZ12345ABCDE.md`
-
-Generate a ULID filename with:
-
-```bash
-python3 -c "import time,random; t=int(time.time()*1000); cs='0123456789ABCDEFGHJKMNPQRSTVWXYZ'; e=''.join(cs[(t>>(45-5*i))&31] for i in range(10)); r=''.join(cs[random.randint(0,31)] for _ in range(16)); print(e+r+'.md')"
-```
-
-**Frontmatter**: Every note MUST start with YAML frontmatter containing at least a `title`:
-
-```markdown
----
-title: My Note Title
-tags:
-  - example
-  - reference
-icon: "\u{1F4DD}"
----
-
-Your note content here...
-```
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| `title` | Yes | Display name shown in the app |
-| `tags` | No | Array of tags for filtering |
-| `icon` | No | Single emoji shown next to the title |
-
-## Editing notes
-
-Edit the markdown body below the frontmatter `---` delimiter. Preserve the frontmatter block.
-To rename a note, change the `title` field in frontmatter (NOT the filename).
-
-## What happens
-
-- New/changed files appear in the Hashy app within seconds
-- If iCloud is enabled, changes sync to all devices automatically
-- The app reads frontmatter for display — no frontmatter means no title in the sidebar
-"""
+        // Write back
+        do {
+            let data = try JSONSerialization.data(withJSONObject: root, options: [.prettyPrinted, .sortedKeys])
+            try data.write(to: settingsFile, options: .atomic)
+        } catch {
+            logger.error("Failed to install session hook: \(error.localizedDescription)")
+        }
+    }
 }

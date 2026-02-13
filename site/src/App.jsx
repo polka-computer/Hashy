@@ -11,6 +11,7 @@ function Nav() {
         </a>
         <div className="nav-links">
           <a href="#features">Features</a>
+          <a href="#shortcuts">Shortcuts</a>
           <a href="#ai">AI</a>
           <a href="#claude-code">Claude Code</a>
           <a href={LINKS.github} target="_blank" rel="noopener">GitHub</a>
@@ -76,10 +77,10 @@ function Hero() {
                 <span className="mock-search-icon">🔍</span>
                 <span className="mock-search-text">Search notes...</span>
               </div>
-              <div className="mock-note active">
+              <div className="mock-note">
                 <span>📝</span> Project Ideas
               </div>
-              <div className="mock-note">
+              <div className="mock-note active">
                 <span>🚀</span> Launch Checklist
               </div>
               <div className="mock-note">
@@ -97,35 +98,37 @@ function Hero() {
                 <span className="mock-delim">---</span>
                 <br />
                 <span className="mock-key">title:</span>{' '}
-                <span className="mock-val">Project Ideas</span>
+                <span className="mock-val">Launch Checklist</span>
                 <br />
                 <span className="mock-key">tags:</span>
                 <br />
-                <span className="mock-tag">  - projects</span>
+                <span className="mock-tag">  - launch</span>
                 <br />
-                <span className="mock-tag">  - brainstorm</span>
+                <span className="mock-tag">  - tasks</span>
                 <br />
                 <span className="mock-key">icon:</span>{' '}
-                <span className="mock-val">"📝"</span>
+                <span className="mock-val">"🚀"</span>
                 <br />
                 <span className="mock-delim">---</span>
               </div>
               <div className="mock-content">
-                <span className="mock-h1"># Next big thing</span>
+                <span className="mock-h1"># Launch Checklist</span>
                 <br /><br />
-                <span className="mock-text">Build an AI-powered markdown editor</span>
+                <span className="mock-text">Ship the markdown editor. See</span>
                 <br />
-                <span className="mock-text">that actually respects your files.</span>
+                <span className="mock-text"><span className="mock-wikilink">@API Design Decisions</span> for context.</span>
                 <br /><br />
-                <span className="mock-h2">## Requirements</span>
+                <span className="mock-h2">## Tasks</span>
                 <br /><br />
-                <span className="mock-list">- Native macOS & iOS</span>
+                <span className="mock-task done"><span className="mock-checkbox checked">&#x2611;</span> <s>Set up iCloud sync</s></span>
                 <br />
-                <span className="mock-list">- iCloud sync</span>
+                <span className="mock-task done"><span className="mock-checkbox checked">&#x2611;</span> <s>Add AI chat panel</s></span>
                 <br />
-                <span className="mock-list highlight">- AI with real tools, not just chat</span>
+                <span className="mock-task done"><span className="mock-checkbox checked">&#x2611;</span> <s>Wiki-link autocomplete</s></span>
                 <br />
-                <span className="mock-list">- Open source</span>
+                <span className="mock-task"><span className="mock-checkbox">&#x2610;</span> Publish to App Store</span>
+                <br />
+                <span className="mock-task highlight"><span className="mock-checkbox">&#x2610;</span> Write launch post</span>
                 <br />
                 <span className="mock-cursor" />
               </div>
@@ -178,28 +181,26 @@ function Hero() {
               </div>
               <div className="phone-nav-bar">
                 <span className="phone-back">‹</span>
-                <span className="phone-nav-title">📝 Project Ideas</span>
+                <span className="phone-nav-title">🚀 Launch Checklist</span>
                 <span className="phone-dots">···</span>
               </div>
               <div className="phone-content">
                 <div className="phone-tags">
-                  <span className="phone-tag">#projects</span>
-                  <span className="phone-tag">#brainstorm</span>
+                  <span className="phone-tag">#launch</span>
+                  <span className="phone-tag">#tasks</span>
                 </div>
                 <div className="phone-md">
-                  <span className="phone-h1"># Next big thing</span>
+                  <span className="phone-h1"># Launch Checklist</span>
                   <br /><br />
-                  <span className="phone-text">Build an AI-powered markdown editor that actually respects your files.</span>
+                  <span className="phone-h2">## Tasks</span>
                   <br /><br />
-                  <span className="phone-h2">## Requirements</span>
-                  <br /><br />
-                  <span className="phone-li">- Native macOS & iOS</span>
+                  <span className="phone-task done">&#x2611; <s>Set up iCloud sync</s></span>
                   <br />
-                  <span className="phone-li">- iCloud sync</span>
+                  <span className="phone-task done">&#x2611; <s>Add AI chat panel</s></span>
                   <br />
-                  <span className="phone-li phone-li-hl">- AI with real tools</span>
+                  <span className="phone-task">&#x2610; Publish to App Store</span>
                   <br />
-                  <span className="phone-li">- Open source</span>
+                  <span className="phone-task phone-li-hl">&#x2610; Write launch post</span>
                 </div>
               </div>
               <div className="phone-toolbar">
@@ -237,6 +238,52 @@ function Features() {
             </div>
           ))}
         </div>
+      </div>
+    </section>
+  )
+}
+
+const SHORTCUTS = [
+  { keys: ['⌘', 'Return'], label: 'Toggle task', desc: 'Check/uncheck a todo on the current line' },
+  { keys: ['⌃', 'L'], label: 'AI Chat', desc: 'Open the AI chat panel' },
+  { keys: ['⇧', '⌘', 'F'], label: 'Full screen', desc: 'Toggle full screen mode' },
+  { keys: ['⌘', 'K'], label: 'Search notes', desc: 'Quick search across all your notes' },
+  { keys: ['⌃', '↑ ↓'], label: 'Navigate notes', desc: 'Jump to the previous or next note in the list' },
+  { keys: ['@'], label: 'Link note', desc: 'Type @ to mention and link to another note, like Obsidian' },
+]
+
+function Shortcuts() {
+  return (
+    <section className="section section-dark" id="shortcuts">
+      <div className="section-inner">
+        <div className="section-header">
+          <span className="section-label">Keyboard Shortcuts</span>
+          <h2 className="section-title">Designed for your keyboard</h2>
+          <p className="section-subtitle">
+            Fast shortcuts for everything you do. Toggle tasks, format text, and navigate - all without leaving the keyboard.
+          </p>
+        </div>
+        <div className="shortcuts-grid">
+          {SHORTCUTS.map((s, i) => (
+            <div className="shortcut-card" key={i}>
+              <div className="shortcut-keys">
+                {s.keys.map((k, j) => (
+                  <span key={j}>
+                    <kbd className="shortcut-key">{k}</kbd>
+                    {j < s.keys.length - 1 && <span className="shortcut-plus">+</span>}
+                  </span>
+                ))}
+              </div>
+              <div className="shortcut-info">
+                <div className="shortcut-label">{s.label}</div>
+                <div className="shortcut-desc">{s.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="shortcuts-note">
+          iOS keyboard accessory bar provides quick access to headings, tasks, code blocks, bold, and inline code.
+        </p>
       </div>
     </section>
   )
@@ -469,6 +516,7 @@ export default function App() {
       <Nav />
       <Hero />
       <Features />
+      <Shortcuts />
       <AISection />
       <ClaudeCode />
       <OpenSource />

@@ -39,7 +39,10 @@ let package = Package(
                 "Frontmatter",
                 .product(name: "ULID", package: "ULID.swift"),
             ],
-            path: "Sources/MarkdownStorage"
+            path: "Sources/MarkdownStorage",
+            resources: [
+                .process("Resources")
+            ]
         ),
         .target(
             name: "HashyEditor",
