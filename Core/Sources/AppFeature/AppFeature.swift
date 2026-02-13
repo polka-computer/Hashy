@@ -294,6 +294,7 @@ public struct AppFeature: Sendable {
         case toggleDarkMode
         case toggleZenMode
         case openInApp(String)
+        case copyVaultPath
     }
 
     @Dependency(\.aiClient) var aiClient
@@ -990,6 +991,17 @@ public struct AppFeature: Sendable {
                     default:
                         break
                     }
+                    #endif
+                }
+
+            case .copyVaultPath:
+                let docsURL = CloudContainerProvider.documentsDirectory()
+                return .run { _ in
+                    #if os(macOS)
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString(docsURL.path, forType: .string)
+                    #else
+                    UIPasteboard.general.string = docsURL.path
                     #endif
                 }
             }

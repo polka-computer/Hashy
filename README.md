@@ -75,6 +75,33 @@ Hashy automatically installs a Claude Code skill into your vault at `.claude/ski
 - Vault folder organization
 - How to create and modify notes correctly
 
+> **[View the full skill →](Core/Sources/MarkdownStorage/Resources/Skills/SKILL.md)**
+
+## Markdown Support
+
+| Feature | Syntax | Status |
+|---------|--------|--------|
+| Heading 1 | `# Heading` | Supported |
+| Heading 2 | `## Heading` | Supported |
+| Heading 3-6 | `### Heading` | Supported |
+| Bold | `**bold**` | Supported |
+| Italic | `*italic*` | Supported |
+| Inline code | `` `code` `` | Supported |
+| Code blocks | ` ``` code ``` ` | Supported |
+| Bullet lists | `- item` | Supported |
+| Task lists | `- [ ] todo` / `- [x] done` | Supported (interactive) |
+| Images | `![alt](path)` | Supported (drag & drop, paste, preview) |
+| Links | `[text](url)` | Supported |
+| Bare URLs | `https://...` | Supported (auto-linked) |
+| Wiki-links | `[[noteId\|name]]` | Supported (with autocomplete) |
+| Blockquotes | `> text` | Supported |
+| Strikethrough | `~~text~~` | Not yet |
+| Tables | `\| col \| col \|` | Not yet |
+| Mermaid diagrams | ` ```mermaid ` | Not yet |
+| Syntax highlighting | Language-specific highlighting | Not yet |
+| HTML blocks | Raw HTML | Not yet |
+| Footnotes | `[^1]` | Not yet |
+
 ## Note Format
 
 ```markdown

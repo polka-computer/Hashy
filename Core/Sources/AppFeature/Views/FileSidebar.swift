@@ -71,6 +71,8 @@ struct FileSidebar: View {
                     Divider()
                     Button("Cursor") { store.send(.openInApp("Cursor")) }
                     Button("VS Code") { store.send(.openInApp("VS Code")) }
+                    Divider()
+                    Button("Copy Path") { store.send(.copyVaultPath) }
                 } label: {
                     Image(systemName: "arrow.up.forward.app")
                         .foregroundStyle(Theme.textDim)
