@@ -180,4 +180,6 @@ MIT
 
 ## Credits
 
+Inspired by [nvALT](https://brettterpstra.com/projects/nvalt/).
+
 Built with 🤖 by [@Jonovono](https://x.com/Jonovono)
