@@ -20,11 +20,9 @@
 ---
 
 <p align="center">
-  <img src="assets/screenshot-mac.png" alt="Hashy on macOS" width="720" />
-</p>
-
-<p align="center">
-  <img src="assets/screenshot-ios.PNG" alt="Hashy on iOS" width="300" />
+  <img src="assets/screenshot-mac.png" alt="Hashy on macOS" width="600" />
+  &nbsp;&nbsp;
+  <img src="assets/screenshot-ios.PNG" alt="Hashy on iOS" width="200" />
 </p>
 
 ---
