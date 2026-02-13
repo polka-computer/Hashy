@@ -1,4 +1,4 @@
-export const VERSION = '0.1.31'
+export const VERSION = '0.2.1'
 
 export const LINKS = {
   github: 'https://github.com/polka-computer/Hashy',

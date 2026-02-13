@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/polka-computer/Hashy/releases/download/0.1.31/hashy-0.1.31-mac-aarch64.zip">Download for macOS</a> &middot;
+  <a href="https://github.com/polka-computer/Hashy/releases/download/0.2.1/hashy-0.2.1-mac-aarch64.zip">Download for macOS</a> &middot;
   <a href="https://apps.apple.com/us/app/hashy-markdown-notes/id6759118041">Download for iOS</a> &middot;
   <a href="https://github.com/polka-computer/Hashy/issues">Issues</a> &middot;
   <a href="https://discord.gg/zwpnkxETJ3">Discord</a>

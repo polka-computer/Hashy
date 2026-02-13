@@ -32,7 +32,7 @@ function Hero() {
       <div className="hero-content">
         <div className="hero-badge">
           <span className="badge-dot" />
-          Open Source &middot; v0.1.25
+          Open Source &middot; v0.2.1
         </div>
         <h1 className="hero-title">
           The markdown editor
