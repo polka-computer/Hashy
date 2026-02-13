@@ -56,6 +56,20 @@ public struct NoteToolContext: Equatable, Sendable {
     }
 }
 
+// MARK: - API Keys
+
+public struct APIKeys: Equatable, Sendable {
+    public let openRouter: String
+    public let openAI: String
+    public let anthropic: String
+
+    public init(openRouter: String, openAI: String, anthropic: String) {
+        self.openRouter = openRouter
+        self.openAI = openAI
+        self.anthropic = anthropic
+    }
+}
+
 // MARK: - AI Error
 
 public enum AIError: LocalizedError, Equatable {
@@ -66,7 +80,7 @@ public enum AIError: LocalizedError, Equatable {
 
     public var errorDescription: String? {
         switch self {
-        case .noAPIKey: "No API key set. Open Settings to add your OpenRouter API key."
+        case .noAPIKey: "No API key set. Open Settings to add an API key."
         case .emptyResponse: "Received an empty response from the model."
         case let .apiError(model, status, detail): "[\(model)] \(status): \(detail)"
         case let .providerError(message): message

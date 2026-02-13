@@ -8,7 +8,7 @@ import MarkdownStorage
 
 public struct AIClient: Sendable {
     public var sendMessage: @Sendable (
-        _ apiKey: String,
+        _ apiKeys: APIKeys,
         _ model: String,
         _ messages: [ChatMessage],
         _ noteContext: String?,
@@ -21,9 +21,7 @@ public struct AIClient: Sendable {
 
 extension AIClient: DependencyKey {
     public static let liveValue = AIClient(
-        sendMessage: { apiKey, model, messages, noteContext, toolContext, onToolCall in
-            guard !apiKey.isEmpty else { throw AIError.noAPIKey }
-
+        sendMessage: { apiKeys, model, messages, noteContext, toolContext, onToolCall in
             let modelShort = model.split(separator: "/").last.map(String.init) ?? model
 
             // Build system prompt
@@ -49,8 +47,6 @@ extension AIClient: DependencyKey {
                 ListNotesTool(context: toolContext),
             ]
 
-            // Create provider and executor
-            let provider = OpenAIProvider(endpoint: .openRouter, apiKey: apiKey)
             let executor = ToolExecutor(tools: tools)
 
             // Build API messages
@@ -69,78 +65,115 @@ extension AIClient: DependencyKey {
 
             await onToolCall("→ \(modelShort) · \(apiMessages.count - 1) messages · \(toolContext.files.count) notes")
 
-            // Config with tools
             let config = GenerateConfig.default.tools(tools)
 
-            // Conversation loop (max 10 rounds for batch operations)
-            var createdURLs: [URL] = []
-            var maxRounds = 10
-
-            while maxRounds > 0 {
-                maxRounds -= 1
-
-                let result = try await provider.generate(
-                    messages: apiMessages,
-                    model: OpenAIModelID(model),
-                    config: config
+            // Route to the correct provider based on the model string
+            #if CONDUIT_TRAIT_ANTHROPIC
+            if AIModels.anthropicRouting.contains(model) {
+                guard !apiKeys.anthropic.isEmpty else { throw AIError.noAPIKey }
+                let provider = AnthropicProvider(apiKey: apiKeys.anthropic)
+                return try await runConversation(
+                    provider: provider, model: AnthropicModelID(model),
+                    messages: &apiMessages, config: config,
+                    executor: executor, toolContext: toolContext,
+                    onToolCall: onToolCall
                 )
+            }
+            #endif
 
-                // Check for tool calls
-                if result.hasToolCalls {
-                    // Add assistant message with tool calls
-                    apiMessages.append(result.assistantMessage())
-
-                    // Execute each tool call via executor
-                    let toolOutputs = try await executor.execute(toolCalls: result.toolCalls)
-
-                    for (index, toolCall) in result.toolCalls.enumerated() {
-                        // Track created URLs from create_note calls
-                        if toolCall.toolName == "create_note" {
-                            let argsJSON = toolCall.arguments.jsonString
-                            if let data = argsJSON.data(using: .utf8),
-                               let args = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                               let title = args["title"] as? String {
-                                let docsDir = toolContext.documentsDirectory
-                                let files = try? FileManager.default.contentsOfDirectory(
-                                    at: docsDir,
-                                    includingPropertiesForKeys: nil
-                                )
-                                if let url = files?.sorted(by: {
-                                    ($0.lastPathComponent) > ($1.lastPathComponent)
-                                }).first(where: { $0.pathExtension == "md" }) {
-                                    createdURLs.append(url)
-                                }
-                            }
-                        }
-
-                        // Build summary
-                        let summary = buildToolSummary(
-                            name: toolCall.toolName,
-                            argsJSON: toolCall.arguments.jsonString
-                        )
-                        await onToolCall(summary)
-
-                        // Add tool result message
-                        if index < toolOutputs.count {
-                            apiMessages.append(.toolOutput(toolOutputs[index]))
-                        }
-                    }
-                    continue
-                }
-
-                // No tool calls — return text
-                let text = result.text
-                guard !text.isEmpty else { throw AIError.emptyResponse }
-                return ChatResult(text: text, createdNoteURLs: createdURLs)
+            if AIModels.openAIRouting.contains(model) {
+                guard !apiKeys.openAI.isEmpty else { throw AIError.noAPIKey }
+                let provider = OpenAIProvider(endpoint: .openAI, apiKey: apiKeys.openAI)
+                return try await runConversation(
+                    provider: provider, model: OpenAIModelID(model),
+                    messages: &apiMessages, config: config,
+                    executor: executor, toolContext: toolContext,
+                    onToolCall: onToolCall
+                )
             }
 
-            return ChatResult(text: "Done.", createdNoteURLs: createdURLs)
+            guard !apiKeys.openRouter.isEmpty else { throw AIError.noAPIKey }
+            let provider = OpenAIProvider(endpoint: .openRouter, apiKey: apiKeys.openRouter)
+            return try await runConversation(
+                provider: provider, model: OpenAIModelID(model),
+                messages: &apiMessages, config: config,
+                executor: executor, toolContext: toolContext,
+                onToolCall: onToolCall
+            )
         }
     )
 
     public static let testValue = AIClient(
         sendMessage: { _, _, _, _, _, _ in ChatResult(text: "test") }
     )
+}
+
+// MARK: - Generic Conversation Loop
+
+private func runConversation<P: TextGenerator>(
+    provider: P,
+    model: P.ModelID,
+    messages: inout [Message],
+    config: GenerateConfig,
+    executor: ToolExecutor,
+    toolContext: NoteToolContext,
+    onToolCall: @Sendable (String) async -> Void
+) async throws -> ChatResult {
+    var createdURLs: [URL] = []
+    var maxRounds = 10
+
+    while maxRounds > 0 {
+        maxRounds -= 1
+
+        let result = try await provider.generate(
+            messages: messages,
+            model: model,
+            config: config
+        )
+
+        if result.hasToolCalls {
+            messages.append(result.assistantMessage())
+
+            let toolOutputs = try await executor.execute(toolCalls: result.toolCalls)
+
+            for (index, toolCall) in result.toolCalls.enumerated() {
+                if toolCall.toolName == "create_note" {
+                    let argsJSON = toolCall.arguments.jsonString
+                    if let data = argsJSON.data(using: .utf8),
+                       let args = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                       let _ = args["title"] as? String {
+                        let docsDir = toolContext.documentsDirectory
+                        let files = try? FileManager.default.contentsOfDirectory(
+                            at: docsDir,
+                            includingPropertiesForKeys: nil
+                        )
+                        if let url = files?.sorted(by: {
+                            ($0.lastPathComponent) > ($1.lastPathComponent)
+                        }).first(where: { $0.pathExtension == "md" }) {
+                            createdURLs.append(url)
+                        }
+                    }
+                }
+
+                let summary = buildToolSummary(
+                    name: toolCall.toolName,
+                    argsJSON: toolCall.arguments.jsonString
+                )
+                await onToolCall(summary)
+
+                if index < toolOutputs.count {
+                    messages.append(.toolOutput(toolOutputs[index]))
+                }
+            }
+            continue
+        }
+
+        let text = result.text
+        guard !text.isEmpty else { throw AIError.emptyResponse }
+        return ChatResult(text: text, createdNoteURLs: createdURLs)
+    }
+
+    return ChatResult(text: "Done.", createdNoteURLs: createdURLs)
 }
 
 // MARK: - Dependency Registration

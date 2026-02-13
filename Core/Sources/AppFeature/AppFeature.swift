@@ -36,6 +36,8 @@ public struct AppFeature: Sendable {
         public var isZenMode: Bool = false
         @Shared(.iCloud("isDarkMode")) public var isDarkMode: Bool = true
         @Shared(.iCloud("openRouterAPIKey")) public var openRouterAPIKey: String = ""
+        @Shared(.iCloud("openAIAPIKey")) public var openAIAPIKey: String = ""
+        @Shared(.iCloud("anthropicAPIKey")) public var anthropicAPIKey: String = ""
         @Shared(.iCloud("selectedModel")) public var selectedModel: String = "anthropic/claude-sonnet-4.5"
         @Shared(.iCloud("customModels")) public var customModels: String = ""
         public var isSettingsVisible: Bool = false
@@ -182,25 +184,22 @@ public struct AppFeature: Sendable {
             customModels.split(separator: ",").map { String($0.trimmingCharacters(in: .whitespaces)) }.filter { !$0.isEmpty }
         }
 
-        /// All models: built-in + custom.
-        public var allModels: [String] {
-            AppFeature.availableModels + customModelList
+        /// Models available based on which API keys are set.
+        public var availableModels: [String] {
+            var models: [String] = []
+            if !openRouterAPIKey.isEmpty { models += AIModels.openRouter }
+            if !openAIAPIKey.isEmpty { models += AIModels.openAI }
+            if !anthropicAPIKey.isEmpty { models += AIModels.anthropic }
+            if models.isEmpty { models = AIModels.openRouter }
+            return models + customModelList
         }
+
+        /// All models (alias for availableModels).
+        public var allModels: [String] { availableModels }
 
         public init() {}
     }
 
-    public static let availableModels = [
-        "anthropic/claude-sonnet-4.5",
-        "anthropic/claude-opus-4.5",
-        "google/gemini-3-flash-preview",
-        "google/gemini-2.5-flash",
-        "google/gemini-2.5-flash-lite",
-        "deepseek/deepseek-v3.2",
-        "moonshotai/kimi-k2.5",
-        "minimax/minimax-m2.1",
-        "x-ai/grok-4.1-fast",
-    ]
 
     public enum Action: Equatable, Sendable {
         // Lifecycle
@@ -267,6 +266,8 @@ public struct AppFeature: Sendable {
         // Settings
         case setSettingsVisible(Bool)
         case updateAPIKey(String)
+        case updateOpenAIAPIKey(String)
+        case updateAnthropicAPIKey(String)
         case updateModel(String)
         case addCustomModel(String)
         case removeCustomModel(String)
@@ -780,7 +781,11 @@ public struct AppFeature: Sendable {
                     }
                 }
 
-                let apiKey = state.openRouterAPIKey
+                let apiKeys = APIKeys(
+                    openRouter: state.openRouterAPIKey,
+                    openAI: state.openAIAPIKey,
+                    anthropic: state.anthropicAPIKey
+                )
                 let model = state.selectedModel
                 // Build messages with enriched context prepended to the last user message
                 var messages = state.chatMessages
@@ -804,7 +809,7 @@ public struct AppFeature: Sendable {
 
                 return .run { [aiClient] send in
                     do {
-                        let result = try await aiClient.sendMessage(apiKey, model, finalMessages, noteContext, toolContext) { summary in
+                        let result = try await aiClient.sendMessage(apiKeys, model, finalMessages, noteContext, toolContext) { summary in
                             await send(.toolCallLogged(summary))
                         }
                         await send(.chatResponseReceived(result.text))
@@ -897,6 +902,14 @@ public struct AppFeature: Sendable {
                 state.$openRouterAPIKey.withLock { $0 = key }
                 return .none
 
+            case let .updateOpenAIAPIKey(key):
+                state.$openAIAPIKey.withLock { $0 = key }
+                return .none
+
+            case let .updateAnthropicAPIKey(key):
+                state.$anthropicAPIKey.withLock { $0 = key }
+                return .none
+
             case let .updateModel(model):
                 state.$selectedModel.withLock { $0 = model }
                 return .none
@@ -905,7 +918,8 @@ public struct AppFeature: Sendable {
                 let trimmed = model.trimmingCharacters(in: .whitespaces)
                 guard !trimmed.isEmpty else { return .none }
                 var list = state.customModelList
-                guard !list.contains(trimmed), !AppFeature.availableModels.contains(trimmed) else { return .none }
+                let builtIn = AIModels.openRouter + AIModels.openAI + AIModels.anthropic
+                guard !list.contains(trimmed), !builtIn.contains(trimmed) else { return .none }
                 list.append(trimmed)
                 state.$customModels.withLock { $0 = list.joined(separator: ",") }
                 state.$selectedModel.withLock { $0 = trimmed }
@@ -916,7 +930,7 @@ public struct AppFeature: Sendable {
                 list.removeAll { $0 == model }
                 state.$customModels.withLock { $0 = list.joined(separator: ",") }
                 if state.selectedModel == model {
-                    state.$selectedModel.withLock { $0 = AppFeature.availableModels[0] }
+                    state.$selectedModel.withLock { $0 = AIModels.openRouter[0] }
                 }
                 return .none
 

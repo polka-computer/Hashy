@@ -202,36 +202,30 @@ struct ChatSidebar: View {
                     // Model picker
                     HStack(spacing: 0) {
                         Menu {
-                            ForEach(AppFeature.availableModels, id: \.self) { model in
-                                Button {
-                                    store.send(.updateModel(model))
-                                } label: {
-                                    if model == store.selectedModel {
-                                        Label(
-                                            model.split(separator: "/").last.map(String.init) ?? model,
-                                            systemImage: "checkmark"
-                                        )
-                                    } else {
-                                        Text(model.split(separator: "/").last.map(String.init) ?? model)
-                                    }
+                            if !store.openRouterAPIKey.isEmpty || (store.openAIAPIKey.isEmpty && store.anthropicAPIKey.isEmpty) {
+                                ForEach(AIModels.openRouter, id: \.self) { model in
+                                    modelButton(model)
+                                }
+                            }
+
+                            if !store.openAIAPIKey.isEmpty {
+                                Divider()
+                                ForEach(AIModels.openAI, id: \.self) { model in
+                                    modelButton(model)
+                                }
+                            }
+
+                            if !store.anthropicAPIKey.isEmpty {
+                                Divider()
+                                ForEach(AIModels.anthropic, id: \.self) { model in
+                                    modelButton(model)
                                 }
                             }
 
                             if !store.customModelList.isEmpty {
                                 Divider()
                                 ForEach(store.customModelList, id: \.self) { model in
-                                    Button {
-                                        store.send(.updateModel(model))
-                                    } label: {
-                                        if model == store.selectedModel {
-                                            Label(
-                                                model.split(separator: "/").last.map(String.init) ?? model,
-                                                systemImage: "checkmark"
-                                            )
-                                        } else {
-                                            Text(model.split(separator: "/").last.map(String.init) ?? model)
-                                        }
-                                    }
+                                    modelButton(model)
                                 }
                             }
                         } label: {
@@ -338,6 +332,22 @@ struct ChatSidebar: View {
         .onChange(of: store.chatFocusTrigger) { _, _ in
             if showsInputBar {
                 isChatInputFocused = true
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func modelButton(_ model: String) -> some View {
+        Button {
+            store.send(.updateModel(model))
+        } label: {
+            if model == store.selectedModel {
+                Label(
+                    model.split(separator: "/").last.map(String.init) ?? model,
+                    systemImage: "checkmark"
+                )
+            } else {
+                Text(model.split(separator: "/").last.map(String.init) ?? model)
             }
         }
     }

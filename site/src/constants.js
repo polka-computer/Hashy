@@ -10,17 +10,33 @@ export const LINKS = {
   twitter: 'https://x.com/Jonovono',
 }
 
-export const MODELS = [
-  { name: 'Claude Sonnet 4.5', provider: 'Anthropic' },
-  { name: 'Claude Opus 4.5', provider: 'Anthropic' },
-  { name: 'Gemini 3 Flash', provider: 'Google' },
-  { name: 'Gemini 2.5 Flash', provider: 'Google' },
-  { name: 'Gemini 2.5 Flash Lite', provider: 'Google' },
-  { name: 'DeepSeek V3.2', provider: 'DeepSeek' },
-  { name: 'Kimi K2.5', provider: 'Moonshot' },
-  { name: 'MiniMax M2.1', provider: 'MiniMax' },
-  { name: 'Grok 4.1 Fast', provider: 'xAI' },
-]
+export const MODELS = {
+  openRouter: [
+    { name: 'Claude Sonnet 4.5', provider: 'Anthropic' },
+    { name: 'Claude Opus 4.5', provider: 'Anthropic' },
+    { name: 'Gemini 3 Flash', provider: 'Google' },
+    { name: 'Gemini 2.5 Flash', provider: 'Google' },
+    { name: 'Gemini 2.5 Flash Lite', provider: 'Google' },
+    { name: 'DeepSeek V3.2', provider: 'DeepSeek' },
+    { name: 'Kimi K2.5', provider: 'Moonshot' },
+    { name: 'MiniMax M2.1', provider: 'MiniMax' },
+    { name: 'Grok 4.1 Fast', provider: 'xAI' },
+    { name: 'GLM-5', provider: 'Z-AI' },
+  ],
+  openAI: [
+    { name: 'GPT-5.2', provider: 'OpenAI' },
+    { name: 'GPT-5.1', provider: 'OpenAI' },
+    { name: 'GPT-5 Mini', provider: 'OpenAI' },
+    { name: 'GPT-5 Nano', provider: 'OpenAI' },
+    { name: 'GPT-4.1', provider: 'OpenAI' },
+  ],
+  anthropic: [
+    { name: 'Claude Opus 4.6', provider: 'Anthropic' },
+    { name: 'Claude Sonnet 4.5', provider: 'Anthropic' },
+    { name: 'Claude Haiku 4.5', provider: 'Anthropic' },
+    { name: 'Claude Sonnet 4', provider: 'Anthropic' },
+  ],
+}
 
 export const TOOLS = [
   { icon: '📝', name: 'Create notes', desc: 'Generate new notes with titles, tags, and content' },
@@ -60,6 +76,6 @@ export const FEATURES = [
   {
     icon: '💸',
     title: 'No subscription',
-    desc: 'Bring your own OpenRouter API key. Pay per use. No monthly fee, no vendor lock-in, no data harvesting.',
+    desc: 'Bring your own API key — OpenRouter, OpenAI, or Anthropic. Pay per use. No monthly fee, no vendor lock-in.',
   },
 ]

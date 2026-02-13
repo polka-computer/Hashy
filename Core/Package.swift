@@ -22,7 +22,7 @@ let package = Package(
         .package(url: "https://github.com/jpsim/Yams.git", from: "6.2.1"),
         .package(
             url: "https://github.com/christopherkarani/Conduit.git", from: "0.3.0",
-            traits: ["OpenAI", "OpenRouter"]),
+            traits: ["Anthropic", "OpenAI", "OpenRouter"]),
         .package(url: "https://github.com/yaslab/ULID.swift.git", from: "1.3.1"),
     ],
     targets: [

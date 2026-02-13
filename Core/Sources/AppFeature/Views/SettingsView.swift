@@ -89,18 +89,68 @@ struct SettingsView: View {
 
                 Divider().background(Theme.border)
 
-                // API Key
+                // API Keys
                 VStack(alignment: .leading, spacing: 4) {
                     Text("OpenRouter API Key")
                         .font(Theme.monoXSmall)
                         .foregroundStyle(Theme.textDim)
 
-                    SecureField("sk-or-...", text: $store.openRouterAPIKey.sending(\.updateAPIKey))
-                        .textFieldStyle(.plain)
-                        .font(Theme.monoSmall)
-                        .foregroundStyle(Theme.text)
-                        .padding(6)
-                        .background(Theme.backgroundTertiary)
+                    HStack(spacing: 6) {
+                        SecureField("sk-or-...", text: $store.openRouterAPIKey.sending(\.updateAPIKey))
+                            .textFieldStyle(.plain)
+                            .font(Theme.monoSmall)
+                            .foregroundStyle(Theme.text)
+                            .padding(6)
+                            .background(Theme.backgroundTertiary)
+
+                        if !store.openRouterAPIKey.isEmpty {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(.green)
+                                .font(.system(size: 12))
+                        }
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("OpenAI API Key")
+                        .font(Theme.monoXSmall)
+                        .foregroundStyle(Theme.textDim)
+
+                    HStack(spacing: 6) {
+                        SecureField("sk-...", text: $store.openAIAPIKey.sending(\.updateOpenAIAPIKey))
+                            .textFieldStyle(.plain)
+                            .font(Theme.monoSmall)
+                            .foregroundStyle(Theme.text)
+                            .padding(6)
+                            .background(Theme.backgroundTertiary)
+
+                        if !store.openAIAPIKey.isEmpty {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(.green)
+                                .font(.system(size: 12))
+                        }
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Anthropic API Key")
+                        .font(Theme.monoXSmall)
+                        .foregroundStyle(Theme.textDim)
+
+                    HStack(spacing: 6) {
+                        SecureField("sk-ant-...", text: $store.anthropicAPIKey.sending(\.updateAnthropicAPIKey))
+                            .textFieldStyle(.plain)
+                            .font(Theme.monoSmall)
+                            .foregroundStyle(Theme.text)
+                            .padding(6)
+                            .background(Theme.backgroundTertiary)
+
+                        if !store.anthropicAPIKey.isEmpty {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(.green)
+                                .font(.system(size: 12))
+                        }
+                    }
                 }
 
                 // Model Picker
@@ -110,17 +160,11 @@ struct SettingsView: View {
                         .foregroundStyle(Theme.textDim)
 
                     Picker("", selection: $store.selectedModel.sending(\.updateModel)) {
-                        ForEach(AppFeature.availableModels, id: \.self) { model in
+                        ForEach(store.availableModels, id: \.self) { model in
                             Text(model.split(separator: "/").last.map(String.init) ?? model)
                                 .tag(model)
                         }
-                        if !store.customModelList.isEmpty {
-                            ForEach(store.customModelList, id: \.self) { model in
-                                Text(model.split(separator: "/").last.map(String.init) ?? model)
-                                    .tag(model)
-                            }
-                        }
-                        if !AppFeature.availableModels.contains(store.selectedModel) && !store.customModelList.contains(store.selectedModel) {
+                        if !store.availableModels.contains(store.selectedModel) {
                             Text(store.selectedModel.split(separator: "/").last.map(String.init) ?? store.selectedModel)
                                 .tag(store.selectedModel)
                         }

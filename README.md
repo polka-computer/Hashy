@@ -23,20 +23,23 @@
 
 Hashy is a native macOS and iOS markdown editor with built-in AI chat, iCloud sync, and Claude Code integration. Your notes are plain `.md` files with YAML frontmatter - no proprietary formats, no lock-in.
 
-Ask the AI to create, organize, search, and edit your notes using 11 specialized tools. Pick from 9+ models via OpenRouter, or add your own.
+Ask the AI to create, organize, search, and edit your notes using 11 specialized tools. Bring your own OpenRouter, OpenAI, or Anthropic API key and pick from 20+ models.
 
 ## Features
 
 - **Native SwiftUI** - Built with Swift 6.2 and The Composable Architecture. Not Electron, not a web view.
 - **iCloud Sync** - Notes sync across all your Apple devices via iCloud Drive. Conflict detection and resolution built in.
 - **AI Chat with Tools** - 11 tools let AI autonomously create, edit, search, and organize your notes. Not just a chatbot.
-- **9+ AI Models** - Claude, Gemini, DeepSeek, Grok, and more via OpenRouter. Bring your own API key.
+- **20+ AI Models** - Use OpenRouter, OpenAI, or Anthropic directly. Claude, GPT, Gemini, DeepSeek, Grok, and more. Bring your own API key.
 - **Claude Code Skill** - Ships with a `.claude/skills/hashy/SKILL.md` that auto-installs into your vault. Claude Code understands your notes.
 - **Plain Markdown** - YAML frontmatter for metadata (title, tags, icon). Standard `.md` files you can read anywhere.
-- **No Subscription** - Pay-per-use via your own OpenRouter key. No monthly fee.
+- **No Subscription** - Pay-per-use via your own API key. No monthly fee.
 
 ## Supported Models
 
+Three API providers, each unlocked by adding your key in Settings:
+
+**OpenRouter** (default — access 100+ models)
 | Provider | Model |
 |----------|-------|
 | Anthropic | Claude Sonnet 4.5 (default) |
@@ -48,6 +51,24 @@ Ask the AI to create, organize, search, and edit your notes using 11 specialized
 | Moonshot | Kimi K2.5 |
 | MiniMax | MiniMax M2.1 |
 | xAI | Grok 4.1 Fast |
+| Z-AI | GLM-5 |
+
+**OpenAI** (direct API)
+| Model |
+|-------|
+| GPT-5.2 |
+| GPT-5.1 |
+| GPT-5 Mini |
+| GPT-5 Nano |
+| GPT-4.1 |
+
+**Anthropic** (direct API)
+| Model |
+|-------|
+| Claude Opus 4.6 |
+| Claude Sonnet 4.5 |
+| Claude Haiku 4.5 |
+| Claude Sonnet 4 |
 
 You can also add custom model identifiers via settings.
 
@@ -121,7 +142,7 @@ Files are named using ULIDs (e.g., `01JQ3K7M8N.md`) for time-ordered uniqueness.
 ## Requirements
 
 - macOS 14.0+ or iOS 17.0+
-- OpenRouter API key (for AI features)
+- An API key from OpenRouter, OpenAI, or Anthropic (for AI features)
 
 ## Building from Source
 

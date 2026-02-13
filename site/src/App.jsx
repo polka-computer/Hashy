@@ -1,5 +1,5 @@
 import './App.css'
-import { LINKS, MODELS, TOOLS, FEATURES } from './constants'
+import { LINKS, TOOLS, FEATURES } from './constants'
 
 function Nav() {
   return (
@@ -41,7 +41,7 @@ function Hero() {
         </h1>
         <p className="hero-subtitle">
           A native macOS & iOS markdown editor with built-in AI chat,
-          any OpenRouter model, iCloud sync, and Claude Code integration.
+          OpenRouter, OpenAI & Anthropic support, iCloud sync, and Claude Code integration.
           <br />
           <span className="hero-dim">Your markdown. Your models. Your rules.</span>
         </p>
@@ -301,24 +301,30 @@ function AISection() {
             <span className="highlight-text">One ridiculously smart editor.</span>
           </h2>
           <p className="section-subtitle">
-            Use any model on OpenRouter. Bring your own API key and pick your favorite.
-            Claude, Gemini, DeepSeek, Grok - switch anytime.
+            Use your own OpenRouter, OpenAI, or Anthropic API key. Pick your favorite model
+            and switch anytime. Add a key, unlock the models.
           </p>
         </div>
 
         <div className="ai-layout">
           <div className="ai-models">
-            <h3 className="ai-section-title">Models</h3>
+            <h3 className="ai-section-title">Providers</h3>
             <div className="model-list">
-              {MODELS.map((m, i) => (
-                <div className="model-chip" key={i}>
-                  <span className="model-provider">{m.provider}</span>
-                  <span className="model-name">{m.name}</span>
-                </div>
-              ))}
+              <div className="model-chip">
+                <span className="model-provider">OpenRouter</span>
+                <span className="model-name">Claude, Gemini, DeepSeek, Grok & more</span>
+              </div>
+              <div className="model-chip">
+                <span className="model-provider">OpenAI</span>
+                <span className="model-name">GPT-5.2, GPT-4.1 & more</span>
+              </div>
+              <div className="model-chip">
+                <span className="model-provider">Anthropic</span>
+                <span className="model-name">Claude Opus 4.6, Sonnet 4.5 & more</span>
+              </div>
               <div className="model-chip model-custom">
                 <span className="model-provider">+</span>
-                <span className="model-name">Any OpenRouter model</span>
+                <span className="model-name">Any custom model</span>
               </div>
             </div>
           </div>
@@ -466,7 +472,7 @@ function Download() {
       <div className="section-inner section-center">
         <h2 className="section-title">Ready to write?</h2>
         <p className="section-subtitle">
-          Download Hashy for free. Bring your OpenRouter key and start writing with AI in seconds.
+          Download Hashy for free. Bring your API key and start writing with AI in seconds.
         </p>
         <div className="download-buttons">
           <a href={LINKS.releases} className="btn btn-xl" target="_blank" rel="noopener">
@@ -501,6 +507,8 @@ function Footer() {
           <a href={LINKS.discord} target="_blank" rel="noopener">Discord</a>
           <a href={LINKS.issues} target="_blank" rel="noopener">Issues</a>
           <a href={LINKS.openRouter} target="_blank" rel="noopener">OpenRouter</a>
+          <a href="https://platform.openai.com" target="_blank" rel="noopener">OpenAI</a>
+          <a href="https://console.anthropic.com" target="_blank" rel="noopener">Anthropic</a>
         </div>
         <div className="footer-copy">
           Built with 🤖 by <a href={LINKS.twitter} target="_blank" rel="noopener">@Jonovono</a>
