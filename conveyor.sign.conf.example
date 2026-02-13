@@ -1,0 +1,13 @@
+include required("conveyor.conf")
+
+app {
+    signing-key = ${env.CONVEYOR_SIGNING_KEY}
+    mac.certificate = developerID_application.cer
+
+    mac.notarization {
+        team-id = "YOUR_TEAM_ID"
+        app-specific-password = ${env.APPLE_APP_SPECIFIC_PASSWORD}
+        apple-id = "your@email.com"
+    }
+    mac.deltas = 5
+}

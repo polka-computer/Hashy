@@ -1,0 +1,6 @@
+# Copy to conveyor.local.conf and configure
+include required("conveyor.sign.conf")
+
+app {
+    version = ${env.BUILD_VERSION}
+}
