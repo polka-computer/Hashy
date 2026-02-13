@@ -1,7 +1,9 @@
+export const VERSION = '0.1.29'
+
 export const LINKS = {
   github: 'https://github.com/polka-computer/Hashy',
   issues: 'https://github.com/polka-computer/Hashy/issues',
-  releases: 'https://polka-computer.github.io/hashy.releases/download.html',
+  releases: `https://github.com/polka-computer/Hashy/releases/download/${VERSION}/hashy-${VERSION}-mac-aarch64.zip`,
   appStore: 'https://apps.apple.com/us/app/hashy-markdown-notes/id6759118041',
   openRouter: 'https://openrouter.ai',
   discord: 'https://discord.gg/zwpnkxETJ3',

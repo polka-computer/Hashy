@@ -7,6 +7,8 @@ import Sharing
 
 #if canImport(AppKit)
 import AppKit
+#elseif canImport(UIKit)
+import UIKit
 #endif
 
 // MARK: - Sort
