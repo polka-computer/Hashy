@@ -307,6 +307,16 @@ struct SettingsView: View {
                 // Keyboard Shortcuts
                 KeyboardShortcutsSection()
                 #endif
+
+                Divider().background(Theme.border)
+
+                // Version
+                HStack {
+                    Text("Hashy v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "?") (\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "?"))")
+                        .font(Theme.monoXSmall)
+                        .foregroundStyle(Theme.textMuted)
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
             }
             .padding(16)
         }

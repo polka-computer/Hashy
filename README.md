@@ -19,6 +19,16 @@
 
 ---
 
+<p align="center">
+  <img src="assets/screenshot-mac.png" alt="Hashy on macOS" width="720" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshot-ios.PNG" alt="Hashy on iOS" width="300" />
+</p>
+
+---
+
 ## What is Hashy?
 
 Hashy is a native macOS and iOS markdown editor with built-in AI chat, iCloud sync, and Claude Code integration. Your notes are plain `.md` files with YAML frontmatter - no proprietary formats, no lock-in.
