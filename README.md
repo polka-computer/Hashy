@@ -123,4 +123,4 @@ MIT
 
 ## Credits
 
-Built by [LongTail Labs](https://longtaillabs.ca)
+Built with 🤖 by [@Jonovono](https://x.com/Jonovono)
